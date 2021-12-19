@@ -9,7 +9,7 @@ from audioread.exceptions import NoBackendError
 import pygame
 import audioread
 from mutagen.mp3 import MP3
-
+from styleSheets import *
 
 pygame.init() # Initialize pygame
 
@@ -52,51 +52,46 @@ class Player(QWidget):
         self.widgets()
         self.layouts()
         
-    #############################Widgets##################################
+    ###########################################Widgets################################################
     def widgets(self): 
         self.progressBar = QProgressBar()
         self.progressBar.setTextVisible(False)
         #progress bar labels
         self.songTimeLabel = QLabel("0:00")
+        self.songTimeLabel.setStyleSheet("background-color: #ff6320;")
         self.songLengthLabel = QLabel("/ 0:00")
+        self.songLengthLabel.setStyleSheet("background-color: #ff6320;")
         
         #buttons
         self.addBtn = QToolButton()
-        self.addBtn.setIcon(QIcon("images/add.png"))
-        self.addBtn = self.buttonStyle(self.addBtn, "Add a song")
+        self.addBtn = self.buttonSettings(self.addBtn, "images/add.png", 50, "Add a song")
         self.addBtn.clicked.connect(self.addSong)
         
         self.shuffleBtn  = QToolButton()
-        self.shuffleBtn.setIcon(QIcon("images/shuffle.png"))
-        self.shuffleBtn = self.buttonStyle(self.shuffleBtn, "Shuffle")
+        self.shuffleBtn = self.buttonSettings(self.shuffleBtn, "images/shuffle.png", 50, "Shuffle")
         self.shuffleBtn.clicked.connect(self.shufflePlaylist)
         
         self.previousBtn = QToolButton()
-        self.previousBtn.setIcon(QIcon("images/previous.png"))
-        self.previousBtn = self.buttonStyle(self.previousBtn, "Previous Song")
+        self.previousBtn = self.buttonSettings(self.previousBtn, "images/previous.png", 50, "Previous Song")
         self.previousBtn.clicked.connect(self.playPrevious)
         
         self.playBtn = QToolButton()
-        self.playBtn.setIcon(QIcon("images/play.png"))
-        self.playBtn = self.buttonStyle(self.playBtn, "Play")
-        self.playBtn.setIconSize(QSize(70, 70))
+        self.playBtn = self.buttonSettings(self.playBtn, "images/play.png", 70, "Play")
         self.playBtn.clicked.connect(self.playSong)
         
         self.nextBtn = QToolButton()
-        self.nextBtn.setIcon(QIcon("images/next.png"))
-        self.nextBtn = self.buttonStyle(self.nextBtn, "Next Song")
+        self.nextBtn = self.buttonSettings(self.nextBtn, "images/next.png", 50, "Next Song")
         self.nextBtn.clicked.connect(self.playNext)
         
         self.muteBtn = QToolButton()
-        self.muteBtn.setIcon(QIcon("images/unmuted.png"))
-        self.muteBtn = self.buttonStyle(self.muteBtn, "Mute")
-        self.muteBtn.setIconSize(QSize(25, 25))
+        self.muteBtn = self.buttonSettings(self.muteBtn, "images/unmuted.png", 25, "Mute")
         self.muteBtn.clicked.connect(self.muteSong)
         
         #volume slider
         self.volumeBar = QSlider()
         self.volumeBar.setOrientation(Qt.Horizontal)
         self.volumeBar.setToolTip("Volume")
+        self.volumeBar.setStyleSheet("background-color: #ff6320;")
         self.volumeBar.setValue(80)
         self.volumeBar.setMinimum(0)
         self.volumeBar.setMaximum(100)
@@ -109,33 +104,18 @@ class Player(QWidget):
         self.playlist = QListWidget()
         self.playlist.doubleClicked.connect(self.playSong)
         
-        
-        self.setStyleSheet("""QToolTip {
-                                background-color: black;
-                                color: white;
-                                border: black solid 1px;
-                                }""") 
-        
         ####Timer####
         self.timer = QTimer()
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.updateProgressBar)
-    
-    #Stlye function for btns
-    def buttonStyle(self, btn, tooltip):
-        btn.setIconSize(QSize(50, 50))
-        btn.setStyleSheet("border: none;")
-        btn.setToolTip(tooltip)
-        
-        return btn
         
         
-    #############################layouts###################################
+    ##########################################layouts###############################################
     def layouts(self):
         self.main = QVBoxLayout()
         self.topMain = QVBoxLayout()
-        self.topGroupBox = QGroupBox("Music Player", self)
-        self.topGroupBox.setStyleSheet("Background-color: #ff6320")
+        self.topGroupBox = QGroupBox("Sweet Beat", self)
+        self.topGroupBox.setStyleSheet(groupBoxStyle())
         self.top = QHBoxLayout()
         self.middle = QHBoxLayout()
         self.bottom = QVBoxLayout()
@@ -170,7 +150,17 @@ class Player(QWidget):
         self.main.addLayout(self.bottom, 65)
         self.setLayout(self.main)
         
-    #############Button Functions###################
+    #######################################Button Functions##############################################
+    
+    #Stlye function for QToolButtons
+    def buttonSettings(self, btn, icon, iconSize, tooltip):
+        btn.setIcon(QIcon(str(icon)))
+        btn.setIconSize(QSize(iconSize, iconSize))
+        btn.setToolTip(tooltip)
+        btn.setStyleSheet(toolBtnStyle())
+        
+        return btn
+    
     def addSong(self):
         playlist = QFileDialog.getOpenFileName(None, "Add Song", "", "Sound Files (*.mp3 *.ogg *.wav)")
         filename = os.path.basename(playlist[0])
