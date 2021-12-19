@@ -288,6 +288,28 @@ class Player(QWidget):
             
             #send song index to play function
             self.loadPlayReadTrack(previousSongIndex)
+            
+    def playNext(self):
+        global songList
+        global timerCount
+        global currentSongIndex
+        global pauseTimer
+        
+        nextSongIndex = currentSongIndex + 1
+        
+        if (nextSongIndex >= len(songList)):
+            return #at last song on playlist, no next function
+        else:
+            #reset the timers for progress bar
+            timerCount = 0
+            pauseTimer = 0
+            
+            #change focus element to previous track and set global currentSongIndex to previous track
+            self.playlist.setCurrentRow(currentSongIndex + 1)
+            currentSongIndex += 1
+            
+            #send song index to play function
+            self.loadPlayReadTrack(nextSongIndex)
 
     def setVolume(self):
         volume = self.volumeBar.value()
