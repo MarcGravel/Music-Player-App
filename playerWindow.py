@@ -3,6 +3,7 @@ from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
+import os
 
 class Player(QWidget):
     def __init__(self):
@@ -41,6 +42,7 @@ class Player(QWidget):
         self.addBtn = QToolButton()
         self.addBtn.setIcon(QIcon("images/add.png"))
         self.addBtn = self.buttonStyle(self.addBtn, "Add a song")
+        self.addBtn.clicked.connect(self.addSong)
         
         self.shuffleBtn  = QToolButton()
         self.shuffleBtn.setIcon(QIcon("images/shuffle.png"))
@@ -53,6 +55,7 @@ class Player(QWidget):
         self.playBtn = QToolButton()
         self.playBtn.setIcon(QIcon("images/play.png"))
         self.playBtn = self.buttonStyle(self.playBtn, "Play")
+        self.playBtn.setIconSize(QSize(70, 70))
         
         self.nextBtn = QToolButton()
         self.nextBtn.setIcon(QIcon("images/next.png"))
@@ -124,6 +127,12 @@ class Player(QWidget):
         self.main.addWidget(self.topGroupBox, 35)
         self.main.addLayout(self.bottom, 65)
         self.setLayout(self.main)
+        
+    #############Button Functions###################
+    def addSong(self):
+        playlist = QFileDialog.getOpenFileName(None, "Add Song", "", "Sound Files (*.mp3 *.ogg *.wav)")
+        filename = os.path.basename(playlist[0])
+        self.playlist.addItem(filename)
     
 def main():
     App = QApplication(sys.argv)
