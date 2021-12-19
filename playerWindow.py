@@ -1,5 +1,4 @@
 import sys
-from typing import Counter
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
@@ -9,6 +8,8 @@ import random, time
 from audioread.exceptions import NoBackendError
 import pygame
 import audioread
+from mutagen.mp3 import MP3
+
 
 pygame.init() # Initialize pygame
 
@@ -230,7 +231,21 @@ class Player(QWidget):
                         self.progressBar.setValue(0)
                         self.progressBar.setMaximum(totalsec)
                 except(NoBackendError):
-                    pass #noBackend error due to ffmpeg, no issues on functionality here
+                    #if sounds file is mp3, try with mutagen
+                    try:
+                        totalsec = MP3(str(songlist[focusedSongIndex]))
+                        songLength = totalsec.info.length
+                        songLength = round(songLength)
+                        
+                        #update progress bar label
+                        min,sec = divmod(songLength, 60)
+                        self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
+                        
+                        self.progressBar.setValue(0)
+                        self.progressBar.setMaximum(songLength)
+                        
+                    except:
+                        print("Cannot match audio file format")
                 
                 self.playBtn.setIcon(QIcon("images/pause.png"))
                 self.playBtn.setToolTip("Pause")
