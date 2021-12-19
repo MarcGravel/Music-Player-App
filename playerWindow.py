@@ -8,7 +8,11 @@ import random
 import pygame
 
 pygame.init() # Initialize pygame
+
+#global vaiables
 songlist = []
+currentVolume = 0;
+muted = False
 
 class Player(QWidget):
     def __init__(self):
@@ -69,17 +73,26 @@ class Player(QWidget):
         self.nextBtn = self.buttonStyle(self.nextBtn, "Next Song")
         
         self.muteBtn = QToolButton()
-        self.muteBtn.setIcon(QIcon("images/mute.png"))
+        self.muteBtn.setIcon(QIcon("images/unmuted.png"))
         self.muteBtn = self.buttonStyle(self.muteBtn, "Mute")
         self.muteBtn.setIconSize(QSize(25, 25))
+        self.muteBtn.clicked.connect(self.muteSong)
         
         #volume slider
         self.volumeBar = QSlider()
         self.volumeBar.setOrientation(Qt.Horizontal)
         self.volumeBar.setToolTip("Volume")
+        self.volumeBar.setValue(80)
+        self.volumeBar.setMinimum(0)
+        self.volumeBar.setMaximum(100)
+        #set initial value of mixer. between 0 and 1
+        pygame.mixer.music.set_volume(0.7)
+        #when value changes, trigger function
+        self.volumeBar.valueChanged.connect(self.setVolume)
         
         #####playlist#####
         self.playlist = QListWidget()
+        self.playlist.doubleClicked.connect(self.playSong)
         
         
         self.setStyleSheet("""QToolTip {
@@ -156,8 +169,33 @@ class Player(QWidget):
         try:
             pygame.mixer.music.load(str(songlist[focusedSongIndex]))
             pygame.mixer.music.play()
-        except: 
-            print("error")
+        except:
+            #pygame only allows 16bit mp3, ogg, wav files
+            print("Error, unable to play format")
+            mbox = QMessageBox.information(self, "Format Error", "Unable to play format. Only 16bit .mp3, .ogg, .wav available")
+            
+    def setVolume(self):
+        volume = self.volumeBar.value()
+        volumeToMixer = volume / 100
+        pygame.mixer.music.set_volume(volumeToMixer)
+        
+    def muteSong(self):
+        global muted
+        global currentVolume
+        
+        if (muted == False):
+            currentVolume = self.volumeBar.value()
+            self.volumeBar.setValue(0)
+            pygame.mixer.music.set_volume(0)
+            muted = True
+            self.muteBtn.setIcon(QIcon("images/mute.png"))
+            self.muteBtn.setToolTip("Unmute")
+        else:
+            self.volumeBar.setValue(currentVolume)
+            pygame.mixer.music.set_volume(currentVolume / 100)
+            muted = False
+            self.muteBtn.setIcon(QIcon("images/unmuted.png"))
+            self.muteBtn.setToolTip("Mute")
         
 def main():
     App = QApplication(sys.argv)
