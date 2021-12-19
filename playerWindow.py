@@ -3,7 +3,7 @@ from typing import Counter
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt, QTimer, QElapsedTimer
+from PyQt5.QtCore import QSize, Qt, QTimer
 import os
 import random
 from audioread.exceptions import NoBackendError
@@ -19,7 +19,9 @@ currentSongIndex = None
 muted = False
 playing = True
 timerCount = 0
+pauseTimer = 0
 songLength = 0
+
 
 class Player(QWidget):
     def __init__(self):
@@ -189,11 +191,13 @@ class Player(QWidget):
                 pygame.mixer.music.pause()
                 self.playBtn.setIcon(QIcon("images/play.png"))
                 self.playBtn.setToolTip("Play")
+                self.timer.stop()
                 playing = False
             else:
                 pygame.mixer.music.unpause()
                 self.playBtn.setIcon(QIcon("images/pause.png"))
                 self.playBtn.setToolTip("Pause")
+                self.timer.start()
                 playing = True
         else:
             try:
@@ -248,10 +252,15 @@ class Player(QWidget):
     def updateProgressBar(self):
         global timerCount
         global songLength
+        global pauseTimer
         
-        print(timerCount)
+        #ensures progress bar starts on correct time if song paused
+        if pauseTimer != 0:
+            timerCount = pauseTimer
+            pauseTimer = 0
         
         timerCount += 1
+        pauseTimer = timerCount
         self.progressBar.setValue(timerCount)
         if (timerCount == songLength):
             self.timer.stop()
