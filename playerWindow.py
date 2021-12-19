@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt, QTimer
 import os
-import random
+import random, time
 from audioread.exceptions import NoBackendError
 import pygame
 import audioread
@@ -55,6 +55,10 @@ class Player(QWidget):
     #############################Widgets##################################
     def widgets(self): 
         self.progressBar = QProgressBar()
+        self.progressBar.setTextVisible(False)
+        #progress bar labels
+        self.songTimeLabel = QLabel("0:00")
+        self.songLengthLabel = QLabel("/ 0:00")
         
         #buttons
         self.addBtn = QToolButton()
@@ -138,6 +142,8 @@ class Player(QWidget):
         
         #top layout widgets
         self.top.addWidget(self.progressBar)
+        self.top.addWidget(self.songTimeLabel)
+        self.top.addWidget(self.songLengthLabel)
         
         #topMid layout widgets
         self.middle.addStretch()
@@ -180,6 +186,7 @@ class Player(QWidget):
         global playing
         global songLength
         global timerCount
+        global pauseTimer
         global currentSongIndex
         timerCount = 0
         
@@ -200,6 +207,8 @@ class Player(QWidget):
                 self.timer.start()
                 playing = True
         else:
+            timerCount = 0
+            pauseTimer = 0
             try:
                 pygame.mixer.music.load(str(songlist[focusedSongIndex]))
                 pygame.mixer.music.play()
@@ -211,6 +220,11 @@ class Player(QWidget):
                         totalsec = f.duration
                         totalsec = round(totalsec)
                         songLength = totalsec
+                        
+                        #update progress bar label
+                        min,sec = divmod(songLength, 60)
+                        self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
+                        
                         self.progressBar.setValue(0)
                         self.progressBar.setMaximum(totalsec)
                 except(NoBackendError):
@@ -257,11 +271,13 @@ class Player(QWidget):
         #ensures progress bar starts on correct time if song paused
         if pauseTimer != 0:
             timerCount = pauseTimer
+            self.songTimeLabel.setText(time.strftime("%M:%S", time.gmtime(timerCount)))
             pauseTimer = 0
         
         timerCount += 1
         pauseTimer = timerCount
         self.progressBar.setValue(timerCount)
+        self.songTimeLabel.setText(time.strftime("%M:%S", time.gmtime(timerCount)))
         if (timerCount == songLength):
             self.timer.stop()
 
