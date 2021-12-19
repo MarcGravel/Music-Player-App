@@ -8,6 +8,7 @@ Clone this repo, create a venv, and install:
 PyQt5==5.15.6
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.9.0
+pygame==2.1.0
 ```
 
 

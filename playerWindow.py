@@ -5,6 +5,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
 import os
 import random
+from pygame import mixer
+from playsound import playsound
+
 
 songlist = []
 
@@ -60,6 +63,7 @@ class Player(QWidget):
         self.playBtn.setIcon(QIcon("images/play.png"))
         self.playBtn = self.buttonStyle(self.playBtn, "Play")
         self.playBtn.setIconSize(QSize(70, 70))
+        self.playBtn.clicked.connect(self.playSong)
         
         self.nextBtn = QToolButton()
         self.nextBtn.setIcon(QIcon("images/next.png"))
@@ -137,14 +141,20 @@ class Player(QWidget):
         playlist = QFileDialog.getOpenFileName(None, "Add Song", "", "Sound Files (*.mp3 *.ogg *.wav)")
         filename = os.path.basename(playlist[0])
         self.playlist.addItem(filename)
-        songlist.append(filename)
+        songlist.append(playlist[0])
         
     def shufflePlaylist(self):
         random.shuffle(songlist)
         self.playlist.clear()
         for song in songlist:
-            self.playlist.addItem(song)
-    
+            filename = os.path.basename(song)
+            self.playlist.addItem(filename)
+            
+    def playSong(self):
+        focusedSongIndex = self.playlist.currentRow()
+        
+        print(str(songlist[focusedSongIndex]))
+        playsound(str(songlist[focusedSongIndex]))
 def main():
     App = QApplication(sys.argv)
     player = Player()
