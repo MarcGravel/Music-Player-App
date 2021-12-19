@@ -120,8 +120,9 @@ class Player(QWidget):
         self.topMain.addLayout(self.top)
         self.topMain.addLayout(self.middle)
         self.topGroupBox.setLayout(self.topMain)
-        self.main.addWidget(self.topGroupBox)
-        self.main.addLayout(self.bottom)
+        #numbers in arguments are setting aspect ratios
+        self.main.addWidget(self.topGroupBox, 35)
+        self.main.addLayout(self.bottom, 65)
         self.setLayout(self.main)
     
 def main():
