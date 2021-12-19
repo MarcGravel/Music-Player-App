@@ -4,6 +4,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
 import os
+import random
+
+songlist = []
 
 class Player(QWidget):
     def __init__(self):
@@ -47,6 +50,7 @@ class Player(QWidget):
         self.shuffleBtn  = QToolButton()
         self.shuffleBtn.setIcon(QIcon("images/shuffle.png"))
         self.shuffleBtn = self.buttonStyle(self.shuffleBtn, "Shuffle")
+        self.shuffleBtn.clicked.connect(self.shufflePlaylist)
         
         self.previousBtn = QToolButton()
         self.previousBtn.setIcon(QIcon("images/previous.png"))
@@ -133,6 +137,13 @@ class Player(QWidget):
         playlist = QFileDialog.getOpenFileName(None, "Add Song", "", "Sound Files (*.mp3 *.ogg *.wav)")
         filename = os.path.basename(playlist[0])
         self.playlist.addItem(filename)
+        songlist.append(filename)
+        
+    def shufflePlaylist(self):
+        random.shuffle(songlist)
+        self.playlist.clear()
+        for song in songlist:
+            self.playlist.addItem(song)
     
 def main():
     App = QApplication(sys.argv)
