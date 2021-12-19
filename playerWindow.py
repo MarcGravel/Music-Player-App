@@ -207,8 +207,10 @@ class Player(QWidget):
                 self.timer.start()
                 playing = True
         else:
+            #if new song started, reset the timers for progress bar
             timerCount = 0
             pauseTimer = 0
+            
             try:
                 pygame.mixer.music.load(str(songlist[focusedSongIndex]))
                 pygame.mixer.music.play()

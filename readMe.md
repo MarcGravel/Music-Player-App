@@ -12,6 +12,7 @@ pygame==2.1.0
 audioread==2.1.9
 ```
 pygame: used to play audio. Only accepts 16bit audio in .mp3, .ogg, .wav formats
+
 audioread: used to determine length of audio files 
 
 ### Why did I build this?
