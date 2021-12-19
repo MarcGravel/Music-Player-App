@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 
 class Player(QWidget):
     def __init__(self):
@@ -37,6 +37,7 @@ class Player(QWidget):
     def widgets(self): 
         self.progressBar = QProgressBar()
         
+        #buttons
         self.addBtn = QToolButton()
         self.addBtn.setIcon(QIcon("images/add.png"))
         self.addBtn = self.buttonStyle(self.addBtn, "Add a song")
@@ -62,11 +63,20 @@ class Player(QWidget):
         self.muteBtn = self.buttonStyle(self.muteBtn, "Mute")
         self.muteBtn.setIconSize(QSize(25, 25))
         
+        #volume slider
+        self.volumeBar = QSlider()
+        self.volumeBar.setOrientation(Qt.Horizontal)
+        self.volumeBar.setToolTip("Volume")
+        
+        #####playlist#####
+        self.playlist = QListWidget()
+        
+        
         self.setStyleSheet("""QToolTip {
                                 background-color: black;
                                 color: white;
                                 border: black solid 1px;
-                                }""")
+                                }""") 
     
     #Stlye function for btns
     def buttonStyle(self, btn, tooltip):
@@ -93,12 +103,18 @@ class Player(QWidget):
         self.top.addWidget(self.progressBar)
         
         #topMid layout widgets
+        self.middle.addStretch()
         self.middle.addWidget(self.addBtn)
         self.middle.addWidget(self.shuffleBtn)
         self.middle.addWidget(self.previousBtn)
         self.middle.addWidget(self.playBtn)
         self.middle.addWidget(self.nextBtn)
+        self.middle.addWidget(self.volumeBar)
         self.middle.addWidget(self.muteBtn)
+        self.middle.addStretch()
+        
+        #bottom layout widgets
+        self.bottom.addWidget(self.playlist)
         
         #set the order/position of layouts
         self.topMain.addLayout(self.top)
