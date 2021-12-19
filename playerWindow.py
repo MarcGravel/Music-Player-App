@@ -5,10 +5,9 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize, Qt
 import os
 import random
-from pygame import mixer
-from playsound import playsound
+import pygame
 
-
+pygame.init() # Initialize pygame
 songlist = []
 
 class Player(QWidget):
@@ -154,7 +153,12 @@ class Player(QWidget):
         focusedSongIndex = self.playlist.currentRow()
         
         print(str(songlist[focusedSongIndex]))
-        playsound(str(songlist[focusedSongIndex]))
+        try:
+            pygame.mixer.music.load(str(songlist[focusedSongIndex]))
+            pygame.mixer.music.play()
+        except: 
+            print("error")
+        
 def main():
     App = QApplication(sys.argv)
     player = Player()
