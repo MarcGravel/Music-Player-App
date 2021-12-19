@@ -1,11 +1,13 @@
 import sys
+from typing import Counter
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import QSize, Qt, QTimer
 import os
 import random
 import pygame
+import audioread
 
 pygame.init() # Initialize pygame
 
@@ -13,6 +15,8 @@ pygame.init() # Initialize pygame
 songlist = []
 currentVolume = 0;
 muted = False
+playing = True
+timerCount = 0
 
 class Player(QWidget):
     def __init__(self):
@@ -100,6 +104,11 @@ class Player(QWidget):
                                 color: white;
                                 border: black solid 1px;
                                 }""") 
+        
+        ####Timer####
+        self.timer = QTimer()
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.updateProgressBar)
     
     #Stlye function for btns
     def buttonStyle(self, btn, tooltip):
@@ -163,16 +172,29 @@ class Player(QWidget):
             self.playlist.addItem(filename)
             
     def playSong(self):
+        global playing
+        
         focusedSongIndex = self.playlist.currentRow()
         
-        print(str(songlist[focusedSongIndex]))
         try:
             pygame.mixer.music.load(str(songlist[focusedSongIndex]))
             pygame.mixer.music.play()
+            self.timer.start()
+            
+            with audioread.audio_open(str(songlist[focusedSongIndex])) as f:
+                totalsec = f.duration
+                totalsec = round(totalsec)
+                self.progressBar.setMaximum(totalsec)
+            
+            self.playBtn.setIcon(QIcon("images/pause.png"))
+            self.playBtn.setToolTip("Pause")
+            playing = True
+            
         except:
             #pygame only allows 16bit mp3, ogg, wav files
             print("Error, unable to play format")
             mbox = QMessageBox.information(self, "Format Error", "Unable to play format. Only 16bit .mp3, .ogg, .wav available")
+            
             
     def setVolume(self):
         volume = self.volumeBar.value()
@@ -196,6 +218,11 @@ class Player(QWidget):
             muted = False
             self.muteBtn.setIcon(QIcon("images/unmuted.png"))
             self.muteBtn.setToolTip("Mute")
+            
+    def updateProgressBar(self):
+        global timerCount
+        timerCount += 1
+        self.progressBar.setValue(timerCount)
         
 def main():
     App = QApplication(sys.argv)
