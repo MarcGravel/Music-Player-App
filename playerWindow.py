@@ -14,7 +14,7 @@ from mutagen.mp3 import MP3
 pygame.init() # Initialize pygame
 
 #global vaiables
-songlist = []
+songList = []
 currentVolume = 0;
 currentSongIndex = None
 muted = False
@@ -22,7 +22,6 @@ playing = True
 timerCount = 0
 pauseTimer = 0
 songLength = 0
-
 
 class Player(QWidget):
     def __init__(self):
@@ -75,6 +74,7 @@ class Player(QWidget):
         self.previousBtn = QToolButton()
         self.previousBtn.setIcon(QIcon("images/previous.png"))
         self.previousBtn = self.buttonStyle(self.previousBtn, "Previous Song")
+        self.previousBtn.clicked.connect(self.playPrevious)
         
         self.playBtn = QToolButton()
         self.playBtn.setIcon(QIcon("images/play.png"))
@@ -85,6 +85,7 @@ class Player(QWidget):
         self.nextBtn = QToolButton()
         self.nextBtn.setIcon(QIcon("images/next.png"))
         self.nextBtn = self.buttonStyle(self.nextBtn, "Next Song")
+        self.nextBtn.clicked.connect(self.playNext)
         
         self.muteBtn = QToolButton()
         self.muteBtn.setIcon(QIcon("images/unmuted.png"))
@@ -174,22 +175,74 @@ class Player(QWidget):
         playlist = QFileDialog.getOpenFileName(None, "Add Song", "", "Sound Files (*.mp3 *.ogg *.wav)")
         filename = os.path.basename(playlist[0])
         self.playlist.addItem(filename)
-        songlist.append(playlist[0])
+        songList.append(playlist[0])
         
     def shufflePlaylist(self):
-        random.shuffle(songlist)
+        random.shuffle(songList)
         self.playlist.clear()
-        for song in songlist:
+        for song in songList:
             filename = os.path.basename(song)
             self.playlist.addItem(filename)
+    
+    #handles loading+playing track, alsoreads song length and sets values for P-bar and counter
+    #definition is used in playSong, playPrevious, playNext functions        
+    def loadPlayReadTrack(self, index):
+        global currentSongIndex
+        global playing
+        global songLength
+        global songList
+        
+        try:
+            pygame.mixer.music.load(str(songList[index]))
+            pygame.mixer.music.play()
+            self.timer.start()
+            currentSongIndex = index
+                
+            try: 
+                with audioread.audio_open(str(songList[index])) as f:
+                    totalsec = f.duration
+                    totalsec = round(totalsec)
+                    songLength = totalsec
+                    
+                    #update progress bar label
+                    min,sec = divmod(songLength, 60)
+                    self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
+                    
+                    self.progressBar.setValue(0)
+                    self.progressBar.setMaximum(totalsec)
+            except(NoBackendError):
+                #if sounds file is mp3, try with mutagen
+                try:
+                    totalsec = MP3(str(songList[index]))
+                    songLength = totalsec.info.length
+                    songLength = round(songLength)
+                    
+                    #update progress bar label
+                    min,sec = divmod(songLength, 60)
+                    self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
+                    
+                    self.progressBar.setValue(0)
+                    self.progressBar.setMaximum(songLength)
+                    
+                except:
+                    print("Cannot match audio file format")
+            
+            self.playBtn.setIcon(QIcon("images/pause.png"))
+            self.playBtn.setToolTip("Pause")
+            playing = True
+                
+        except:
+            #pygame only allows 16bit mp3, ogg, wav files
+            print("Error, unable to play format")
+            mbox = QMessageBox.information(self, "Format Error", "Unable to play format. Only 16bit .mp3, .ogg, .wav available")
             
     def playSong(self):
         global playing
         global songLength
+        global songList
         global timerCount
         global pauseTimer
         global currentSongIndex
-        timerCount = 0
         
         focusedSongIndex = self.playlist.currentRow()
         
@@ -212,51 +265,30 @@ class Player(QWidget):
             timerCount = 0
             pauseTimer = 0
             
-            try:
-                pygame.mixer.music.load(str(songlist[focusedSongIndex]))
-                pygame.mixer.music.play()
-                self.timer.start()
-                currentSongIndex = focusedSongIndex
-                
-                try: 
-                    with audioread.audio_open(str(songlist[focusedSongIndex])) as f:
-                        totalsec = f.duration
-                        totalsec = round(totalsec)
-                        songLength = totalsec
-                        
-                        #update progress bar label
-                        min,sec = divmod(songLength, 60)
-                        self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
-                        
-                        self.progressBar.setValue(0)
-                        self.progressBar.setMaximum(totalsec)
-                except(NoBackendError):
-                    #if sounds file is mp3, try with mutagen
-                    try:
-                        totalsec = MP3(str(songlist[focusedSongIndex]))
-                        songLength = totalsec.info.length
-                        songLength = round(songLength)
-                        
-                        #update progress bar label
-                        min,sec = divmod(songLength, 60)
-                        self.songLengthLabel.setText("/ "+str(min)+":"+str(sec))
-                        
-                        self.progressBar.setValue(0)
-                        self.progressBar.setMaximum(songLength)
-                        
-                    except:
-                        print("Cannot match audio file format")
-                
-                self.playBtn.setIcon(QIcon("images/pause.png"))
-                self.playBtn.setToolTip("Pause")
-                playing = True
-                
-            except:
-                #pygame only allows 16bit mp3, ogg, wav files
-                print("Error, unable to play format")
-                mbox = QMessageBox.information(self, "Format Error", "Unable to play format. Only 16bit .mp3, .ogg, .wav available")
+            #send song index to play function
+            self.loadPlayReadTrack(focusedSongIndex)
             
+    def playPrevious(self):
+        global timerCount
+        global currentSongIndex
+        global pauseTimer
+        
+        previousSongIndex = currentSongIndex - 1
+        
+        if (previousSongIndex < 0):
+            return #at first song on playlist, cannot go previous
+        else:
+            #reset the timers for progress bar
+            timerCount = 0
+            pauseTimer = 0
             
+            #change focus element to previous track and set global currentSongIndex to previous track
+            self.playlist.setCurrentRow(currentSongIndex - 1)
+            currentSongIndex -= 1
+            
+            #send song index to play function
+            self.loadPlayReadTrack(previousSongIndex)
+
     def setVolume(self):
         volume = self.volumeBar.value()
         volumeToMixer = volume / 100
