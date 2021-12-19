@@ -272,16 +272,23 @@ class Player(QWidget):
         global timerCount
         global currentSongIndex
         global pauseTimer
+        global songList
         
         previousSongIndex = currentSongIndex - 1
         
-        if (previousSongIndex < 0):
-            return #at first song on playlist, cannot go previous
-        else:
-            #reset the timers for progress bar
-            timerCount = 0
-            pauseTimer = 0
+        #reset the timers for progress bar
+        timerCount = 0
+        pauseTimer = 0
+        
+        if (previousSongIndex < 0): #if at start of playlist, play last track
+            #change focus element to last track of songlist track and set global currentSongIndex to same
+            self.playlist.setCurrentRow(len(songList) - 1)
+            currentSongIndex = len(songList) - 1
             
+            #send song index to play function
+            self.loadPlayReadTrack(len(songList) - 1)
+        
+        else: #else play previous
             #change focus element to previous track and set global currentSongIndex to previous track
             self.playlist.setCurrentRow(currentSongIndex - 1)
             currentSongIndex -= 1
@@ -296,15 +303,24 @@ class Player(QWidget):
         global pauseTimer
         
         nextSongIndex = currentSongIndex + 1
+        #reset the timers for progress bar
+        timerCount = 0
+        pauseTimer = 0
         
-        if (nextSongIndex >= len(songList)):
-            return #at last song on playlist, no next function
-        else:
+        if (nextSongIndex >= len(songList)): #if at end of playlist, play first track    
+            #change focus element to first track and set global currentSongIndex to same
+            self.playlist.setCurrentRow(0)
+            currentSongIndex = 0
+            
+            #send song index to play function
+            self.loadPlayReadTrack(0)
+            
+        else: #else play next track
             #reset the timers for progress bar
             timerCount = 0
             pauseTimer = 0
             
-            #change focus element to previous track and set global currentSongIndex to previous track
+            #change focus element to next track and set global currentSongIndex to same
             self.playlist.setCurrentRow(currentSongIndex + 1)
             currentSongIndex += 1
             
