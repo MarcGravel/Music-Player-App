@@ -34,3 +34,14 @@ def progressBarStyle():
             stop: 1 #05b8cc );
         }
     """
+    
+def playlistStyle():
+    return """
+        QListWidget {
+            background: #ffbfa3;
+            color: black;
+            border-radius: 15px;
+            border: 3px solid grey;
+            padding: 12px 12px;
+        }
+    """

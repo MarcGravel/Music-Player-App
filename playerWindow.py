@@ -107,6 +107,7 @@ class Player(QWidget):
         #####playlist#####
         self.playlist = QListWidget()
         self.playlist.doubleClicked.connect(self.playSong)
+        self.playlist.setStyleSheet(playlistStyle())
         
         ####Timer####
         self.timer = QTimer()
