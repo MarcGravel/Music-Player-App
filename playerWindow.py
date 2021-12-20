@@ -178,7 +178,16 @@ class Player(QWidget):
         songList.append(playlist[0])
         
     def removeSong(self):
-        print("test")
+        global songList
+        global currentSongIndex
+        
+        focusedSongIndex = self.playlist.currentRow()
+        #remove song from both lists
+        self.playlist.takeItem(focusedSongIndex)
+        songList.pop(focusedSongIndex)
+        #add 1+ to current song index as next song on list after removal is i+1
+        currentSongIndex += 1
+
         
     def shufflePlaylist(self):
         random.shuffle(songList)
