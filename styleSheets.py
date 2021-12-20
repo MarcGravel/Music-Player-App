@@ -2,14 +2,15 @@ def toolBtnStyle():
     return """
         QToolButton {
             border: none;
-            background-color: #ff6320;
+            background: transparent;
         }
     """
 
 def groupBoxStyle():
     return """
         QGroupBox {
-            background-color: #ff6320;
+            background: QLinearGradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+            background: QLinearGradient( x1:0 y1:0, x2:1 y2:0, stop:0 #ff6320, stop:1 #cc3d00);
             font: 15pt Bold;
             color: white;
             border: 2px solid grey;
@@ -38,10 +39,12 @@ def progressBarStyle():
 def playlistStyle():
     return """
         QListWidget {
-            background: #ffbfa3;
+            background: QLinearGradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+            background: QLinearGradient( x1:0 y1:0, x2:1 y2:0, stop:0 #ffbfa3, stop:1 #ffd4c2);
             color: black;
             border-radius: 15px;
             border: 3px solid grey;
             padding: 12px 12px;
+            font: 12pt Helvetica;
         }
     """

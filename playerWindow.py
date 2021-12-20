@@ -28,7 +28,7 @@ class Player(QWidget):
         super().__init__()
         self.setWindowTitle("Sweet Beat Music Player")
         self.setWindowIcon(QIcon("images/appIcon.svg"))
-        self.setStyleSheet("background-color: black;")
+        self.setStyleSheet("background-color: black; color: white;")
         self.setGeometry(600, 150, 500, 750)
         self.center()
         self.UI()
@@ -62,9 +62,9 @@ class Player(QWidget):
         
         #progress bar labels
         self.songTimeLabel = QLabel("0:00")
-        self.songTimeLabel.setStyleSheet("background-color: #ff6320;")
+        self.songTimeLabel.setStyleSheet("background: transparent;")
         self.songLengthLabel = QLabel("/ 0:00")
-        self.songLengthLabel.setStyleSheet("background-color: #ff6320;")
+        self.songLengthLabel.setStyleSheet("background: transparent;")
         
         #buttons
         self.addBtn = QToolButton()
@@ -95,7 +95,7 @@ class Player(QWidget):
         self.volumeBar = QSlider()
         self.volumeBar.setOrientation(Qt.Horizontal)
         self.volumeBar.setToolTip("Volume")
-        self.volumeBar.setStyleSheet("background-color: #ff6320;")
+        self.volumeBar.setStyleSheet("background: transparent;")
         self.volumeBar.setValue(80)
         self.volumeBar.setMinimum(0)
         self.volumeBar.setMaximum(100)
