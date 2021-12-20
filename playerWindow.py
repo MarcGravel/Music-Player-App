@@ -56,6 +56,10 @@ class Player(QWidget):
     def widgets(self): 
         self.progressBar = QProgressBar()
         self.progressBar.setTextVisible(False)
+        self.progressBar.setStyleSheet(progressBarStyle())
+        #force repaint every time there is a change due to chunck lag on stylesheet
+        self.progressBar.valueChanged.connect(self.progressBar.repaint)
+        
         #progress bar labels
         self.songTimeLabel = QLabel("0:00")
         self.songTimeLabel.setStyleSheet("background-color: #ff6320;")
