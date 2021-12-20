@@ -28,7 +28,7 @@ class Player(QWidget):
         super().__init__()
         self.setWindowTitle("Sweet Beat Music Player")
         self.setWindowIcon(QIcon("images/appIcon.svg"))
-        self.setStyleSheet("background-color: black; color: white;")
+        self.setStyleSheet("background-color: black; color: black; font: bold")
         self.setGeometry(600, 150, 500, 750)
         self.center()
         self.UI()
@@ -68,8 +68,12 @@ class Player(QWidget):
         
         #buttons
         self.addBtn = QToolButton()
-        self.addBtn = self.buttonSettings(self.addBtn, "images/add.png", 50, "Add a song")
+        self.addBtn = self.buttonSettings(self.addBtn, "images/add.png", 35, "Add a song")
         self.addBtn.clicked.connect(self.addSong)
+        
+        self.removeBtn = QToolButton()
+        self.removeBtn = self.buttonSettings(self.removeBtn, "images/remove.png", 35, "Remove selected song")
+        self.removeBtn.clicked.connect(self.removeSong)
         
         self.shuffleBtn  = QToolButton()
         self.shuffleBtn = self.buttonSettings(self.shuffleBtn, "images/shuffle.png", 50, "Shuffle")
@@ -135,6 +139,7 @@ class Player(QWidget):
         #topMid layout widgets
         self.middle.addStretch()
         self.middle.addWidget(self.addBtn)
+        self.middle.addWidget(self.removeBtn)
         self.middle.addWidget(self.shuffleBtn)
         self.middle.addWidget(self.previousBtn)
         self.middle.addWidget(self.playBtn)
@@ -171,6 +176,9 @@ class Player(QWidget):
         filename = os.path.basename(playlist[0])
         self.playlist.addItem(filename)
         songList.append(playlist[0])
+        
+    def removeSong(self):
+        print("test")
         
     def shufflePlaylist(self):
         random.shuffle(songList)

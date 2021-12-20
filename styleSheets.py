@@ -4,6 +4,9 @@ def toolBtnStyle():
             border: none;
             background: transparent;
         }
+        QToolButton QWidget {
+            color: black;
+        }
     """
 
 def groupBoxStyle():
